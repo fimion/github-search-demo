@@ -1,19 +1,30 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Hello Vue 3 + Vite" />
+  <SearchBar v-model:query="query" @submit="flush"/>
+  <pre>{{results}}</pre>
 </template>
+<script>
+import SearchBar from "./components/SearchBar.vue";
+import useDebouncedFetch from "./features/useDebouncedFetch.js";
+import {computed, ref, unref} from 'vue'
+export default {
+  components: {SearchBar},
+  setup(){
+    const query = ref('');
 
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
+    const url = computed(()=>'https://api.github.com/search/users?q='+encodeURIComponent(unref(query)));
+
+    const {results, flush, error} = useDebouncedFetch(url);
+
+    return {
+      query,
+      results,
+      flush,
+      error,
+    };
+  }
+}
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+
 </style>
