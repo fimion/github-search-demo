@@ -3,7 +3,7 @@
     <h1>
       GitHubCities
     </h1>
-    <div>More GeoCities for your GitHub</div>
+    <div>More GeoCities for your GitHub Search</div>
     <SearchBar @submit="triggerQuery"/>
     <template v-if="status === FETCH_STATUS.RESOLVED">
       <h2>Results ({{ results.userCount }})</h2>
