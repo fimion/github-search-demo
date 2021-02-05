@@ -28,8 +28,8 @@ const {GITHUB_API_TOKEN} = process.env
  */
 async function searchHandler(event, context) {
 
-  const searchQuery = `query ($q: String!, $cursor: String) {
-  search(query: $q, type: USER, first: 12, after: $cursor) {
+  const searchQuery = `query ($q: String!, $after: String, $first: Int, $before:String, $last:Int) {
+  search(query: $q, type: USER, first: $first, last:$last, before:$before, after: $after) {
     userCount
     pageInfo {
       hasNextPage
@@ -39,6 +39,7 @@ async function searchHandler(event, context) {
     }
     users: nodes {
       ... on User {
+        id
         login
         avatarUrl
         name
@@ -48,7 +49,7 @@ async function searchHandler(event, context) {
         url
         websiteUrl
         status {
-          message,
+          message
         }
         followers: followers(first: 0) {
           totalCount
@@ -60,10 +61,20 @@ async function searchHandler(event, context) {
     }
   }
 }`;
+  const {q, next, prev} = event.queryStringParameters;
   const variables = {
-    q: event.queryStringParameters.q,
-    cursor: event.queryStringParameters.cursor,
+    q,
   }
+  if(next){
+    variables.first = 12;
+    variables.after = next;
+  }else if(prev){
+    variables.last = 12;
+    variables.before = prev;
+  }else{
+    variables.first = 12;
+  }
+
   const octokit = new Octokit({auth: GITHUB_API_TOKEN})
 
   return {

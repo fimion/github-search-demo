@@ -7,16 +7,17 @@
     <SearchBar @submit="triggerQuery"/>
     <template v-if="status === FETCH_STATUS.RESOLVED">
       <h2>Results ({{ results.userCount }})</h2>
+      <page-buttons @next="changePage" :page-info="results.pageInfo"/>
       <ul class="user-list">
-        <li class="user" v-for="user in results.users"
+        <li class="user" v-for="user in users"
             :key="user.id">
           <div class="follows">
-            <span>Following: {{user.following.totalCount}}</span>
-            <span>Followers: {{user.followers.totalCount}}</span>
+            <span v-if="user.following">Following: {{user.following.totalCount}}</span>
+            <span v-if="user.followers">Followers: {{user.followers.totalCount}}</span>
           </div>
           <a class="user-box"
              :href="user.url">
-            <img class="avatar"
+            <img v-if="user.avatarUrl" class="avatar"
                  :src="user.avatarUrl"
                  :alt="`avatar for ${user.name}`">
             {{ user.name }} (@{{ user.login }})
@@ -25,6 +26,7 @@
           <p v-if="user.status">Status: {{user.status.message}}</p>
         </li>
       </ul>
+      <page-buttons @next="changePage" :page-info="results.pageInfo"/>
     </template>
     <template v-if="status===FETCH_STATUS.ERROR">
       <h2>Oh no! :(</h2>
@@ -36,8 +38,9 @@
 </template>
 <script>
 import SearchBar from "./components/SearchBar.vue"
+import PageButtons from "./components/PageButtons.vue"
 import fetchWrapper from "./utils/fetchWrapper.js"
-import {computed, ref, reactive, defineComponent} from 'vue'
+import {computed, ref, toRefs, defineComponent} from 'vue'
 
 /**
  * @typedef {import('@vue/reactivity').Ref} Ref
@@ -53,7 +56,7 @@ const FETCH_STATUS = Object.freeze({
 
 
 export default defineComponent({
-  components: {SearchBar},
+  components: {SearchBar,PageButtons},
   setup() {
     const query = ref('')
     const status = ref(FETCH_STATUS.READY)
@@ -63,9 +66,11 @@ export default defineComponent({
 
     const searchUrl = computed(() => {
       const q = encodeURIComponent(query.value)
-      const cur = cursor.value ? `&cursor=${cursor.value}` : ''
+      const cur = cursor.value ? `&${cursor.value}` : ''
       return `/api/search?q=${q}${cur}`
     })
+
+    const users = computed(()=>(results.value?.users || []).filter((e)=>!!e.id));
 
 
     const callSearch = async () => {
@@ -93,8 +98,17 @@ export default defineComponent({
     }
 
     const changePage = async (cur) => {
-      cursor.value = cur
-      return await callSearch()
+      if(cur === results.value?.pageInfo.endCursor){
+        cursor.value = 'next';
+      }
+      if(cur === results.value?.pageInfo.startCursor){
+        cursor.value = 'prev';
+      }
+      if(cursor.value){
+        cursor.value += '='+cur
+      }
+      await callSearch();
+      window.scrollTo({top:0});
     }
 
 
@@ -105,6 +119,7 @@ export default defineComponent({
       changePage,
       triggerQuery,
       FETCH_STATUS,
+      users
     }
   },
 })
