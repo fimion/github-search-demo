@@ -156,7 +156,7 @@ a, a:link, a:visited, a:hover, a:active, a:focus{
 
 .user-list {
   display: grid;
-  max-width: 100vw;
+  min-width: 100vw;
   grid-gap: 10px;
   grid-template-columns: minmax(var(--min-user-width), auto);
 }
