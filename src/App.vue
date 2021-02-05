@@ -187,7 +187,9 @@ a, a:link, a:visited, a:hover, a:active, a:focus{
 }
 
 .avatar {
-  max-width: var(--min-user-width);
+  width: var(--min-user-width);
+  height: var(--min-user-width);
+  background-color: lightslategray;
   border-radius: 50%;
   border: darkblue 5px solid;
 }
