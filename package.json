@@ -2,17 +2,19 @@
   "name": "simple-github-search",
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite",
+    "dev": "netlify dev",
     "build": "vite build",
     "serve": "vite preview"
   },
   "dependencies": {
     "vue": "^3.0.5",
-    "lodash.debounce": "^4.0.8"
+    "lodash.debounce": "^4.0.8",
+    "@octokit/core": "^3.2.5"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^1.1.2",
     "@vue/compiler-sfc": "^3.0.5",
-    "vite": "^2.0.0-beta.50"
+    "vite": "^2.0.0-beta.50",
+    "netlify-cli": "^3.5.0"
   }
 }

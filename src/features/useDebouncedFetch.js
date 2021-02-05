@@ -1,5 +1,6 @@
 import {ref, unref, toRefs, watch, computed} from 'vue';
 import debounce from 'lodash.debounce';
+import fetchWrapper from "../utils/fetchWrapper.js"
 
 /**
  * @typedef {import('@vue/reactivity').Ref} Ref
@@ -29,28 +30,13 @@ export default function useDebouncedFetch(url, options= ref({})){
     return opts;
   })
 
-  const fetchCall = debounce(async (url, options)=>{
+  const fetchCall = debounce(async (url,options)=>{
     try {
-      const response = await fetch(url, options);
-      if(response.ok){
-        error.value = null;
-        results.value = await response.json();
-      }else{
-        results.value = {};
-        error.value = {
-          status: response.status,
-          statusText: response.statusText,
-          body: await response.json(),
-        }
-      }
-
-    } catch (e) {
+      results.value =  await fetchWrapper(url, options);
+      error.value = null;
+    }catch (e) {
+      error.value = e;
       results.value = {};
-      error.value = {
-        status: 0,
-        statusText: 'InternalError',
-        body: e.toString(),
-      }
     }
   }, unref(delay))
 

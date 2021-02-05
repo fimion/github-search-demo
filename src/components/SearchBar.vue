@@ -1,36 +1,28 @@
 <template>
-  <form v-bind="$attrs" @submit.prevent="$emit('submit', $event)">
+  <form v-bind="$attrs" @submit.prevent="$emit('submit', query)">
     <label for="SearchBar">Search:</label>
-    <input type="text" name="search" id="SearchBar" v-model="query"/>
+    <input type="text" name="search" id="SearchBar" v-model="query" v-autofocus />
     <button>Go</button>
   </form>
 </template>
 <script>
-import {computed, unref} from 'vue';
-
-export default {
+import {ref, defineComponent} from 'vue';
+import Autofocus from "../directives/v-autofocus.js"
+export default defineComponent({
   name: "SearchBar",
-  props:{
-    query:{
-      type:String,
-      required: true,
-    },
-  },
+  directives:{Autofocus},
   emits:{
-    'update:query':{
-      type: String,
-    },
     'submit':{
-      type: Event,
+      type: String,
     }
   },
-  setup(props, {emit}){
-    const query = computed({ get:()=>unref(props.query),set:(v)=>emit('update:query', v)})
+  setup(){
+    const query = ref('')
     return {
       query,
     }
   }
-}
+});
 </script>
 
 <style scoped>
