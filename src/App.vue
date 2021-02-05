@@ -1,12 +1,19 @@
 <template>
   <div class="githubcities">
-    <h1>GitHubCities</h1>
+    <h1>
+      GitHubCities
+    </h1>
+    <div>More GeoCities for your GitHub</div>
     <SearchBar @submit="triggerQuery"/>
     <template v-if="status === FETCH_STATUS.RESOLVED">
       <h2>Results ({{ results.userCount }})</h2>
       <ul class="user-list">
         <li class="user" v-for="user in results.users"
             :key="user.id">
+          <div class="follows">
+            <span>Following: {{user.following.totalCount}}</span>
+            <span>Followers: {{user.followers.totalCount}}</span>
+          </div>
           <a class="user-box"
              :href="user.url">
             <img class="avatar"
@@ -14,6 +21,8 @@
                  :alt="`avatar for ${user.name}`">
             {{ user.name }} (@{{ user.login }})
           </a>
+          <p>{{user.bio}}</p>
+          <p v-if="user.status">Status: {{user.status.message}}</p>
         </li>
       </ul>
     </template>
@@ -103,6 +112,15 @@ export default defineComponent({
 
 <style>
 
+
+
+:root {
+  --min-user-width: 150px;
+  --text-color:darkblue;
+  --background-color:hotpink;
+  color:var(--text-color);
+  background-color:var(--background-color);
+}
 * {
   padding: 0;
   margin: 0;
@@ -110,8 +128,8 @@ export default defineComponent({
   font-family: 'Pangolin', cursive;
 }
 
-:root {
-  --min-user-width: 100px;
+a, a:link, a:visited, a:hover, a:active, a:focus{
+  color: var(--text-color);
 }
 
 .githubcities{
@@ -123,28 +141,51 @@ export default defineComponent({
 
 .user-list {
   display: grid;
-  max-width: 100%;
+  max-width: 100vw;
   grid-gap: 10px;
-  grid-template-columns: minmax(var(--min-user-width), auto) minmax(var(--min-user-width), auto) minmax(var(--min-user-width), auto);
+  grid-template-columns: minmax(var(--min-user-width), auto);
 }
 
 .user {
+  --text-color: darkorchid;
   display: inline-block;
   margin: 10px;
+  border: royalblue 5px groove;
+  background-color:aqua;
+  color:var(--text-color)
 }
 
+
+.user>p{
+  text-align: center;
+}
+.follows{
+  display:flex;
+  flex-flow: row nowrap;
+  justify-content: space-around;
+}
 .user-box {
   display: flex;
   flex-flow: column nowrap;
   justify-content: center;
   align-items: center;
-  border: indigo 5px inset;
-
 }
 
 .avatar {
   max-width: var(--min-user-width);
   border-radius: 50%;
-  border: seagreen 5px solid;
+  border: darkblue 5px solid;
 }
+@media screen and (min-width: 480px){
+  .user-list{
+    grid-template-columns: minmax(var(--min-user-width), auto) minmax(var(--min-user-width), auto);
+  }
+}
+
+@media screen and (min-width: 768px){
+  .user-list{
+    grid-template-columns: minmax(var(--min-user-width), 1fr) minmax(var(--min-user-width), 1fr) minmax(var(--min-user-width), 1fr);
+  }
+}
+
 </style>
